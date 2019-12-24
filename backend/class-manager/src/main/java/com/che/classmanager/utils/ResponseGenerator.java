@@ -35,4 +35,15 @@ public class ResponseGenerator {
 
 		return new ResponseEntity<>(new Document("ret", "true").toJson(), HttpStatus.OK);
 	}
+
+	/**
+	 * Generates the ok(200) response
+	 * 
+	 * @param object The response entity
+	 * @return The response
+	 */
+	public static ResponseEntity<Object> okResponse(Object object) {
+
+		return new ResponseEntity<>(object, HttpStatus.OK);
+	}
 }

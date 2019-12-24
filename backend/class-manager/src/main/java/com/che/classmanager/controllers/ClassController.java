@@ -67,11 +67,14 @@ public class ClassController {
 		if (!name.matches(IClassConstants.CLASSNAMEREGEX)) {
 			return ResponseGenerator.generateBadRequest("Invalid class name.");
 		}
-		if (classIDSet.contains(cid) || classNameSet.contains(name)) {
-			return ResponseGenerator.generateBadRequest("The class name/ID already present.");
+		if (classIDSet.contains(cid)) {
+			return ResponseGenerator.generateBadRequest("The cid '" + cid + "' already exists.");
+		}
+		if (classNameSet.contains(name)) {
+			return ResponseGenerator.generateBadRequest("The class name '" + name + "' already exists.");
 		}
 		if (StringUtils.isNotBlank(pid) && !classIDSet.contains(pid)) {
-			return ResponseGenerator.generateBadRequest("The class not found with the PID.");
+			return ResponseGenerator.generateBadRequest("The pid '" + pid + "' not found.");
 		}
 
 		// Creating the new class instance
@@ -116,9 +119,13 @@ public class ClassController {
 	 * @return The class information
 	 */
 	@GetMapping(value = "/getclass/{cid}")
-	public ResponseEntity<String> getClassInfo(@PathParam(value = "cid") String cid) {
+	public ResponseEntity<?> getClassInfo(@PathParam(value = "cid") String cid) {
 
-		return null;
+		if (hierarchyMap.containsKey(cid)) {
+			return ResponseGenerator.okResponse(hierarchyMap.get(cid).getData());
+		} else {
+			return ResponseGenerator.generateBadRequest("The CID " + cid + " does not exist");
+		}
 	}
 
 	/**
