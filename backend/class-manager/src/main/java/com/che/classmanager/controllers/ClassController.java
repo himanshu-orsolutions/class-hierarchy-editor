@@ -61,6 +61,28 @@ public class ClassController {
 	}
 
 	/**
+	 * Recursively iterates over the nodes and gets the sub-classes information
+	 * 
+	 * @param node   The current node
+	 * @param output The output
+	 */
+	private void recursiveRetrieval(Node node, Document output) {
+
+		output.put("cid", node.getData().getCid());
+		output.put("name", node.getData().getName());
+		List<Document> childClassesInfo = new ArrayList<>();
+		List<Node> childNodes = node.getChilds();
+
+		for (Node childNode : childNodes) {
+			Document childClassInfo = new Document();
+			recursiveRetrieval(childNode, childClassInfo);
+			childClassesInfo.add(childClassInfo);
+		}
+
+		output.put("superclassOf", childClassesInfo);
+	}
+
+	/**
 	 * API to add new class
 	 * 
 	 * @param cid        The class ID
@@ -232,13 +254,14 @@ public class ClassController {
 	 * @return The information
 	 */
 	@GetMapping(value = "/subclasses/{cid}")
-	public ResponseEntity<String> getSubClassesInfo(@PathParam(value = "cid") String cid) {
+	public ResponseEntity<?> getSubClassesInfo(@PathParam(value = "cid") String cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
 		} else {
-			removeNode(hierarchyMap.get(cid));
-			return ResponseGenerator.okResponse();
+			Document output = new Document();
+			recursiveRetrieval(hierarchyMap.get(cid), output);
+			return ResponseGenerator.okResponse(output.toJson());
 		}
 	}
 }
