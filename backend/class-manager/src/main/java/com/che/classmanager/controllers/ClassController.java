@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.websocket.server.PathParam;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -197,19 +198,35 @@ public class ClassController {
 	}
 
 	/**
-	 * API to get information of current class and all its super classes
+	 * API to get information of all super classes of specified class
 	 * 
 	 * @param cid The class ID
 	 * @return The information
 	 */
 	@GetMapping(value = "/superclasses/{cid}")
-	public ResponseEntity<String> getSuperClassesInfo(@PathParam(value = "cid") String cid) {
+	public ResponseEntity<?> getSuperClassesInfo(@PathParam(value = "cid") String cid) {
 
-		return null;
+		if (!hierarchyMap.containsKey(cid)) {
+			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
+		} else {
+			Document output = new Document();
+			List<Document> list = new ArrayList<>();
+			Node currentNode = hierarchyMap.get(cid);
+
+			while (StringUtils.isNotBlank(currentNode.getData().getPid())) { // Iterating over all the parent classes
+				String pid = currentNode.getData().getPid();
+				currentNode = hierarchyMap.get(pid);
+				list.add(new Document("cid", currentNode.getData().getCid()).append("name",
+						currentNode.getData().getName()));
+			}
+
+			output.put("list", list);
+			return ResponseGenerator.okResponse(output.toJson());
+		}
 	}
 
 	/**
-	 * API to get information of current class and all its sub classes
+	 * API to get information of a specified class and all its sub classes
 	 * 
 	 * @param cid The class ID
 	 * @return The information
@@ -217,6 +234,11 @@ public class ClassController {
 	@GetMapping(value = "/subclasses/{cid}")
 	public ResponseEntity<String> getSubClassesInfo(@PathParam(value = "cid") String cid) {
 
-		return null;
+		if (!hierarchyMap.containsKey(cid)) {
+			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
+		} else {
+			removeNode(hierarchyMap.get(cid));
+			return ResponseGenerator.okResponse();
+		}
 	}
 }
