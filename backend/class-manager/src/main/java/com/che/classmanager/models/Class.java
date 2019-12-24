@@ -41,4 +41,11 @@ public class Class {
 	public void setPid(String pid) {
 		this.pid = pid;
 	}
+
+	/**
+	 * GEts the string representation of the Class
+	 */
+	public String toString() {
+		return cid;
+	}
 }

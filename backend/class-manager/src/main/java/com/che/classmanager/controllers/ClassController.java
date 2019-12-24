@@ -1,9 +1,15 @@
 package com.che.classmanager.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.websocket.server.PathParam;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,12 +19,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.che.classmanager.constants.IClassConstants;
+import com.che.classmanager.models.Class;
+import com.che.classmanager.models.Node;
+import com.che.classmanager.utils.ResponseGenerator;
+
 /**
  * The ClassController. It holds APIs which operates on the class information.
  */
 @CrossOrigin
 @RestController(value = "/")
 public class ClassController {
+
+	/**
+	 * The set of current class IDs
+	 */
+	private Set<String> classIDSet = new HashSet<>();
+
+	/**
+	 * The set of current class names
+	 */
+	private Set<String> classNameSet = new HashSet<>();
+
+	/**
+	 * The class hierarchy map
+	 */
+	private Map<String, Node> hierarchyMap = new HashMap<>();
 
 	/**
 	 * API to add new class
@@ -34,7 +60,41 @@ public class ClassController {
 			@RequestParam(value = "name", required = true) String name,
 			@RequestParam(value = "abstract") String isAbstract, @RequestParam(value = "pid") String pid) {
 
-		return null;
+		// Validating the input
+		if (!cid.matches(IClassConstants.CLASSIDREGEX)) {
+			return ResponseGenerator.generateBadRequest("Invalid class ID.");
+		}
+		if (!name.matches(IClassConstants.CLASSNAMEREGEX)) {
+			return ResponseGenerator.generateBadRequest("Invalid class name.");
+		}
+		if (classIDSet.contains(cid) || classNameSet.contains(name)) {
+			return ResponseGenerator.generateBadRequest("The class name/ID already present.");
+		}
+		if (StringUtils.isNotBlank(pid) && !classIDSet.contains(pid)) {
+			return ResponseGenerator.generateBadRequest("The class not found with the PID.");
+		}
+
+		// Creating the new class instance
+		Class obj = new Class();
+		obj.setCid(cid);
+		obj.setName(name);
+		obj.setPid(pid);
+		obj.setIsAbstract(StringUtils.isBlank(isAbstract) ? "false" : isAbstract); // Adding default values if not
+																					// present
+
+		// Adding the new CID in the set
+		classIDSet.add(cid);
+
+		// Adding the new class name in the set
+		classNameSet.add(name);
+
+		// Adding the class into the hierarchy map
+		if (StringUtils.isNotBlank(pid)) {
+			hierarchyMap.get(pid).getChilds().add(obj);
+		}
+		hierarchyMap.put(cid, new Node(obj, new ArrayList<>()));
+
+		return ResponseGenerator.okResponse();
 	}
 
 	/**
