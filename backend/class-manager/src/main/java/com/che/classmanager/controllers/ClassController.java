@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -118,13 +119,13 @@ public class ClassController {
 	 * @param cid The class ID
 	 * @return The class information
 	 */
-	@GetMapping(value = "/getclass/{cid}")
-	public ResponseEntity<?> getClassInfo(@PathParam(value = "cid") String cid) {
+	@GetMapping(value = "/getclass/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getClassInfo(@PathVariable(value = "cid") String cid) {
 
 		if (hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.okResponse(hierarchyMap.get(cid).getData());
 		} else {
-			return ResponseGenerator.generateBadRequest("The CID " + cid + " does not exist");
+			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
 		}
 	}
 
