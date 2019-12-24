@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.websocket.server.PathParam;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.springframework.http.MediaType;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.che.classmanager.constants.IClassConstants;
 import com.che.classmanager.models.Class;
+import com.che.classmanager.models.Container;
 import com.che.classmanager.models.Node;
 import com.che.classmanager.utils.ResponseGenerator;
 
@@ -55,9 +54,18 @@ public class ClassController {
 		}
 
 		// Removing the node from hierarchy map and class name set
-		hierarchyMap.remove(node);
+		hierarchyMap.remove(node.getData().getCid());
 		classNameSet.remove(node.getData().getName());
-		node.getChilds().forEach(child -> removeNode(child));
+
+		// Removing the node from its parent's list
+		String pid = node.getData().getPid();
+		if (StringUtils.isNotBlank(pid) && hierarchyMap.containsKey(pid) && hierarchyMap.get(pid).getChilds() != null) {
+			hierarchyMap.get(pid).getChilds().remove(node);
+		}
+
+		if (node.getChilds() != null) {
+			node.getChilds().forEach(child -> removeNode(child));
+		}
 	}
 
 	/**
@@ -71,15 +79,20 @@ public class ClassController {
 		output.put("cid", node.getData().getCid());
 		output.put("name", node.getData().getName());
 		List<Document> childClassesInfo = new ArrayList<>();
-		List<Node> childNodes = node.getChilds();
+		HashSet<Node> childNodes = node.getChilds();
 
+		if (childNodes == null) {
+			return;
+		}
 		for (Node childNode : childNodes) {
 			Document childClassInfo = new Document();
-			recursiveRetrieval(childNode, childClassInfo);
+			recursiveRetrieval(hierarchyMap.get(childNode.getData().getCid()), childClassInfo);
 			childClassesInfo.add(childClassInfo);
 		}
 
-		output.put("superclassOf", childClassesInfo);
+		if (!childClassesInfo.isEmpty()) {
+			output.put("superclassOf", childClassesInfo);
+		}
 	}
 
 	/**
@@ -94,7 +107,8 @@ public class ClassController {
 	@GetMapping(value = "/addclass", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addNewClass(@RequestParam(value = "cid", required = true) String cid,
 			@RequestParam(value = "name", required = true) String name,
-			@RequestParam(value = "abstract") String isAbstract, @RequestParam(value = "pid") String pid) {
+			@RequestParam(value = "abstract", required = false) String isAbstract,
+			@RequestParam(value = "pid", required = false) String pid) {
 
 		// Validating the input
 		if (!cid.matches(IClassConstants.CLASSIDREGEX)) {
@@ -128,7 +142,7 @@ public class ClassController {
 		if (StringUtils.isNotBlank(pid)) {
 			hierarchyMap.get(pid).getChilds().add(new Node(obj, null));
 		}
-		hierarchyMap.put(cid, new Node(obj, new ArrayList<>()));
+		hierarchyMap.put(cid, new Node(obj, new HashSet<>()));
 
 		return ResponseGenerator.okResponse();
 	}
@@ -140,10 +154,10 @@ public class ClassController {
 	 * @return The insertion status
 	 */
 	@PostMapping(value = "/addClassJSON", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> addNewClass(@RequestBody List<com.che.classmanager.models.Class> classes) {
+	public ResponseEntity<String> addNewClass(@RequestBody Container container) {
 
 		// Validating the input
-		for (Class classObj : classes) {
+		for (Class classObj : container.getClasses()) {
 			if (StringUtils.isAnyBlank(classObj.getCid(), classObj.getName())) {
 				return ResponseGenerator.generateBadRequest("The cid/ name cannot be null/empty.");
 			}
@@ -171,7 +185,7 @@ public class ClassController {
 		}
 
 		// Adding all classes
-		for (Class classObj : classes) {
+		for (Class classObj : container.getClasses()) {
 
 			// Adding the new class name in the set
 			classNameSet.add(classObj.getName());
@@ -180,7 +194,7 @@ public class ClassController {
 			if (StringUtils.isNotBlank(classObj.getPid())) {
 				hierarchyMap.get(classObj.getPid()).getChilds().add(new Node(classObj, null));
 			}
-			hierarchyMap.put(classObj.getCid(), new Node(classObj, new ArrayList<>()));
+			hierarchyMap.put(classObj.getCid(), new Node(classObj, new HashSet<>()));
 		}
 		return ResponseGenerator.okResponse();
 
@@ -208,8 +222,8 @@ public class ClassController {
 	 * @param cid The class ID
 	 * @return The deletion status
 	 */
-	@GetMapping(value = "/deleteclass/{cid}")
-	public ResponseEntity<String> deleteClassInfo(@PathParam(value = "cid") String cid) {
+	@GetMapping(value = "/deleteclass/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> deleteClassInfo(@PathVariable(value = "cid") String cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
@@ -225,8 +239,8 @@ public class ClassController {
 	 * @param cid The class ID
 	 * @return The information
 	 */
-	@GetMapping(value = "/superclasses/{cid}")
-	public ResponseEntity<?> getSuperClassesInfo(@PathParam(value = "cid") String cid) {
+	@GetMapping(value = "/superclasses/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getSuperClassesInfo(@PathVariable(value = "cid") String cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
@@ -253,8 +267,8 @@ public class ClassController {
 	 * @param cid The class ID
 	 * @return The information
 	 */
-	@GetMapping(value = "/subclasses/{cid}")
-	public ResponseEntity<?> getSubClassesInfo(@PathParam(value = "cid") String cid) {
+	@GetMapping(value = "/subclasses/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getSubClassesInfo(@PathVariable(value = "cid") String cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");

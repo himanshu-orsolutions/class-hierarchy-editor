@@ -1,6 +1,6 @@
 package com.che.classmanager.models;
 
-import java.util.List;
+import java.util.HashSet;
 
 /**
  * The Node. It holds information of a class and its child classes.
@@ -8,7 +8,7 @@ import java.util.List;
 public class Node {
 
 	private Class data;
-	private List<Node> childs;
+	private HashSet<Node> childs;
 
 	/**
 	 * Instantiating the node
@@ -16,7 +16,7 @@ public class Node {
 	 * @param data   The data
 	 * @param childs The childs
 	 */
-	public Node(Class data, List<Node> childs) {
+	public Node(Class data, HashSet<Node> childs) {
 		this.data = data;
 		this.childs = childs;
 	}
@@ -29,11 +29,25 @@ public class Node {
 		this.data = data;
 	}
 
-	public List<Node> getChilds() {
+	public HashSet<Node> getChilds() {
 		return childs;
 	}
 
-	public void setChilds(List<Node> childs) {
+	public void setChilds(HashSet<Node> childs) {
 		this.childs = childs;
+	}
+
+	@Override
+	public int hashCode() {
+		return data.getCid().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj != null) {
+			return data.getCid().equals(((Node) obj).getData().getCid());
+		}
+		return false;
 	}
 }
