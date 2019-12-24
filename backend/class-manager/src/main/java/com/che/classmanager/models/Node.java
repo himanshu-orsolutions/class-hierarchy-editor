@@ -8,7 +8,7 @@ import java.util.List;
 public class Node {
 
 	private Class data;
-	private List<Class> childs;
+	private List<Node> childs;
 
 	/**
 	 * Instantiating the node
@@ -16,7 +16,7 @@ public class Node {
 	 * @param data   The data
 	 * @param childs The childs
 	 */
-	public Node(Class data, List<Class> childs) {
+	public Node(Class data, List<Node> childs) {
 		this.data = data;
 		this.childs = childs;
 	}
@@ -29,11 +29,11 @@ public class Node {
 		this.data = data;
 	}
 
-	public List<Class> getChilds() {
+	public List<Node> getChilds() {
 		return childs;
 	}
 
-	public void setChilds(List<Class> childs) {
+	public void setChilds(List<Node> childs) {
 		this.childs = childs;
 	}
 }
