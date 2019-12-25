@@ -100,6 +100,25 @@ Specifications:
 }
 ```
 
+#### Update the class name
+```
+GET: /cheditor/api/editclass/{class-id}
+```
+Specifications:
+- Request body:
+```
+{
+	"name":"NewClass"
+}
+```
+- If the 'cid' is not present, the following error will be thrown:
+```
+{
+    "ret": "false",
+    "message": "The cid 11 does not exist"
+}
+```
+
 #### Get all super classes
 ```
 GET: /cheditor/api/superclasses/{class-id}
