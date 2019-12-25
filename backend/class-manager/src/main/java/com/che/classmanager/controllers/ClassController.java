@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -42,9 +43,9 @@ public class ClassController {
 	CHERepository cheRepository;
 
 	/**
-	 * The set of current class names
+	 * The map of current class names
 	 */
-	private Set<String> classNameSet = new HashSet<>();
+	private Map<String, String> classNameMap = new HashMap<>();
 
 	/**
 	 * The class hierarchy map
@@ -64,7 +65,7 @@ public class ClassController {
 
 		// Removing the node from hierarchy map and class name set
 		hierarchyMap.remove(node.getData().getCid());
-		classNameSet.remove(node.getData().getName());
+		classNameMap.remove(node.getData().getName());
 
 		// Removing the node from its parent's list
 		String pid = node.getData().getPid();
@@ -129,7 +130,7 @@ public class ClassController {
 		if (hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid '" + cid + "' already exists.");
 		}
-		if (classNameSet.contains(name)) {
+		if (classNameMap.containsKey(name)) {
 			return ResponseGenerator.generateBadRequest("The class name '" + name + "' already exists.");
 		}
 		if (StringUtils.isNotBlank(pid) && !hierarchyMap.containsKey(pid)) {
@@ -145,7 +146,7 @@ public class ClassController {
 		// present
 
 		// Adding the new class name in the set
-		classNameSet.add(name);
+		classNameMap.put(name, cid);
 
 		// Adding the class into the hierarchy map
 		if (StringUtils.isNotBlank(pid)) {
@@ -154,6 +155,39 @@ public class ClassController {
 		hierarchyMap.put(cid, new Node(cheClass, new HashSet<>()));
 
 		return ResponseGenerator.okResponse();
+	}
+
+	/**
+	 * API to search for classes
+	 * 
+	 * @param tag The search tag
+	 * @return The list of classes
+	 */
+	@GetMapping(value = "/searchclasses", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> searchClasses(@RequestParam(value = "tag", required = true) String tag) {
+
+		// Validating the input
+		if (!tag.matches(IClassConstants.SEARCHTAGREGEX)) {
+			return ResponseGenerator.generateBadRequest("Invalid tag.");
+		} else {
+			Document output = new Document();
+			List<Document> classes = new ArrayList<>();
+			Set<String> namesSet = classNameMap.keySet();
+			Pattern tagPattern = Pattern.compile(tag, Pattern.CASE_INSENSITIVE);
+
+			namesSet.forEach(name -> {
+				if (tagPattern.matcher(name).find()) {
+					Document classInfo = new Document();
+					Node node = hierarchyMap.get(classNameMap.get(name));
+					classInfo.append("cid", node.getData().getCid()).append("name", node.getData().getName())
+							.append("pid", node.getData().getPid()).append("abstract", node.getData().getIsAbstract());
+					classes.add(classInfo);
+				}
+			});
+
+			output.put("classes", classes);
+			return ResponseGenerator.okResponse(output.toJson());
+		}
 	}
 
 	/**
@@ -179,7 +213,7 @@ public class ClassController {
 			if (hierarchyMap.containsKey(cheClass.getCid())) {
 				return ResponseGenerator.generateBadRequest("The cid '" + cheClass.getCid() + "' already exists.");
 			}
-			if (classNameSet.contains(cheClass.getName())) {
+			if (classNameMap.containsKey(cheClass.getName())) {
 				return ResponseGenerator
 						.generateBadRequest("The class name '" + cheClass.getName() + "' already exists.");
 			}
@@ -197,7 +231,7 @@ public class ClassController {
 		for (CHEClass cheClass : container.getClasses()) {
 
 			// Adding the new class name in the set
-			classNameSet.add(cheClass.getName());
+			classNameMap.put(cheClass.getName(), cheClass.getCid());
 
 			// Adding the class into the hierarchy map
 			if (StringUtils.isNotBlank(cheClass.getPid())) {
@@ -262,14 +296,14 @@ public class ClassController {
 		if (!cheClass.getName().matches(IClassConstants.CLASSNAMEREGEX)) {
 			return ResponseGenerator.generateBadRequest("Invalid class name.");
 		}
-		if (classNameSet.contains(cheClass.getName())) {
+		if (classNameMap.containsKey(cheClass.getName())) {
 			return ResponseGenerator.generateBadRequest("The class name '" + cheClass.getName() + "' already exists.");
 		}
 
 		// Updating the class name at all places
 		CHEClass data = hierarchyMap.get(cid).getData();
-		classNameSet.remove(data.getName());
-		classNameSet.add(cheClass.getName());
+		classNameMap.remove(data.getName());
+		classNameMap.put(cheClass.getName(), cheClass.getCid());
 
 		if (StringUtils.isNotBlank(data.getPid())) {
 			hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));

@@ -14,4 +14,9 @@ public interface IClassConstants {
 	 * The class ID regex
 	 */
 	public static final String CLASSIDREGEX = "^[\\d]+$";
+
+	/**
+	 * The search tag regex
+	 */
+	public static final String SEARCHTAGREGEX = "^[\\w ]+$";
 }
