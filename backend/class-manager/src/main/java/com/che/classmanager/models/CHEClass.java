@@ -1,13 +1,29 @@
 package com.che.classmanager.models;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * The model Class. It holds information of a class.
  */
+@Entity(name = "Classes")
 public class CHEClass {
 
+	@Id
+	@Column(name = "cid")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String cid;
+
+	@Column(name = "name")
 	private String name;
+
+	@Column(name = "abstract")
 	private String isAbstract;
+
+	@Column(name = "pid")
 	private String pid;
 
 	public String getCid() {

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,6 +25,7 @@ import com.che.classmanager.constants.IClassConstants;
 import com.che.classmanager.models.CHEClass;
 import com.che.classmanager.models.Container;
 import com.che.classmanager.models.Node;
+import com.che.classmanager.repositories.CHERepository;
 import com.che.classmanager.utils.ResponseGenerator;
 
 /**
@@ -32,6 +34,12 @@ import com.che.classmanager.utils.ResponseGenerator;
 @CrossOrigin
 @RestController(value = "/")
 public class ClassController {
+
+	/**
+	 * The class hierarchy repository
+	 */
+	@Autowired
+	CHERepository cheRepository;
 
 	/**
 	 * The set of current class names
