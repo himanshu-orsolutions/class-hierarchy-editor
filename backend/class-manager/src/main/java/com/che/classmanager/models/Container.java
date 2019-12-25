@@ -7,13 +7,13 @@ import java.util.List;
  */
 public class Container {
 
-	private List<Class> classes;
+	private List<CHEClass> classes;
 
-	public List<Class> getClasses() {
+	public List<CHEClass> getClasses() {
 		return classes;
 	}
 
-	public void setClasses(List<Class> classes) {
+	public void setClasses(List<CHEClass> classes) {
 		this.classes = classes;
 	}
 }

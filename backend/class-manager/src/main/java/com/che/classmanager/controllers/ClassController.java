@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.che.classmanager.constants.IClassConstants;
-import com.che.classmanager.models.Class;
+import com.che.classmanager.models.CHEClass;
 import com.che.classmanager.models.Container;
 import com.che.classmanager.models.Node;
 import com.che.classmanager.utils.ResponseGenerator;
@@ -128,11 +129,11 @@ public class ClassController {
 		}
 
 		// Creating the new class instance
-		Class obj = new Class();
-		obj.setCid(cid);
-		obj.setName(name);
-		obj.setPid(pid);
-		obj.setIsAbstract(StringUtils.isBlank(isAbstract) ? "false" : isAbstract); // Adding default values if not
+		CHEClass cheClass = new CHEClass();
+		cheClass.setCid(cid);
+		cheClass.setName(name);
+		cheClass.setPid(pid);
+		cheClass.setIsAbstract(StringUtils.isBlank(isAbstract) ? "false" : isAbstract); // Adding default values if not
 																					// present
 
 		// Adding the new class name in the set
@@ -140,9 +141,9 @@ public class ClassController {
 
 		// Adding the class into the hierarchy map
 		if (StringUtils.isNotBlank(pid)) {
-			hierarchyMap.get(pid).getChilds().add(new Node(obj, null));
+			hierarchyMap.get(pid).getChilds().add(new Node(cheClass, null));
 		}
-		hierarchyMap.put(cid, new Node(obj, new HashSet<>()));
+		hierarchyMap.put(cid, new Node(cheClass, new HashSet<>()));
 
 		return ResponseGenerator.okResponse();
 	}
@@ -157,44 +158,44 @@ public class ClassController {
 	public ResponseEntity<String> addNewClass(@RequestBody Container container) {
 
 		// Validating the input
-		for (Class classObj : container.getClasses()) {
-			if (StringUtils.isAnyBlank(classObj.getCid(), classObj.getName())) {
+		for (CHEClass cheClass : container.getClasses()) {
+			if (StringUtils.isAnyBlank(cheClass.getCid(), cheClass.getName())) {
 				return ResponseGenerator.generateBadRequest("The cid/ name cannot be null/empty.");
 			}
-			if (!classObj.getCid().matches(IClassConstants.CLASSIDREGEX)) {
-				return ResponseGenerator.generateBadRequest("Invalid class ID: " + classObj.getCid());
+			if (!cheClass.getCid().matches(IClassConstants.CLASSIDREGEX)) {
+				return ResponseGenerator.generateBadRequest("Invalid class ID: " + cheClass.getCid());
 			}
-			if (!classObj.getName().matches(IClassConstants.CLASSNAMEREGEX)) {
-				return ResponseGenerator.generateBadRequest("Invalid class name: " + classObj.getName());
+			if (!cheClass.getName().matches(IClassConstants.CLASSNAMEREGEX)) {
+				return ResponseGenerator.generateBadRequest("Invalid class name: " + cheClass.getName());
 			}
-			if (hierarchyMap.containsKey(classObj.getCid())) {
-				return ResponseGenerator.generateBadRequest("The cid '" + classObj.getCid() + "' already exists.");
+			if (hierarchyMap.containsKey(cheClass.getCid())) {
+				return ResponseGenerator.generateBadRequest("The cid '" + cheClass.getCid() + "' already exists.");
 			}
-			if (classNameSet.contains(classObj.getName())) {
+			if (classNameSet.contains(cheClass.getName())) {
 				return ResponseGenerator
-						.generateBadRequest("The class name '" + classObj.getName() + "' already exists.");
+						.generateBadRequest("The class name '" + cheClass.getName() + "' already exists.");
 			}
-			if (StringUtils.isNotBlank(classObj.getPid()) && !hierarchyMap.containsKey(classObj.getPid())) {
-				return ResponseGenerator.generateBadRequest("The pid '" + classObj.getPid() + "' not found.");
+			if (StringUtils.isNotBlank(cheClass.getPid()) && !hierarchyMap.containsKey(cheClass.getPid())) {
+				return ResponseGenerator.generateBadRequest("The pid '" + cheClass.getPid() + "' not found.");
 			}
 
 			// Adding the default value if not present
-			if (StringUtils.isBlank(classObj.getIsAbstract())) {
-				classObj.setIsAbstract("false");
+			if (StringUtils.isBlank(cheClass.getIsAbstract())) {
+				cheClass.setIsAbstract("false");
 			}
 		}
 
 		// Adding all classes
-		for (Class classObj : container.getClasses()) {
+		for (CHEClass cheClass : container.getClasses()) {
 
 			// Adding the new class name in the set
-			classNameSet.add(classObj.getName());
+			classNameSet.add(cheClass.getName());
 
 			// Adding the class into the hierarchy map
-			if (StringUtils.isNotBlank(classObj.getPid())) {
-				hierarchyMap.get(classObj.getPid()).getChilds().add(new Node(classObj, null));
+			if (StringUtils.isNotBlank(cheClass.getPid())) {
+				hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
 			}
-			hierarchyMap.put(classObj.getCid(), new Node(classObj, new HashSet<>()));
+			hierarchyMap.put(cheClass.getCid(), new Node(cheClass, new HashSet<>()));
 		}
 		return ResponseGenerator.okResponse();
 
@@ -229,6 +230,38 @@ public class ClassController {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
 		} else {
 			removeNode(hierarchyMap.get(cid));
+			return ResponseGenerator.okResponse();
+		}
+	}
+
+	/**
+	 * API to edit a specific class
+	 * 
+	 * @param cid The class ID
+	 * @return The updation status
+	 */
+	@PutMapping(value = "/editclass/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> editClasInfo(@PathVariable(value = "cid") String cid,
+			@RequestBody CHEClass cheClass) {
+
+		if (StringUtils.isBlank(cheClass.getName())) {
+			return ResponseGenerator.generateBadRequest("The class name cannot be null/empty.");
+		}
+		if (!hierarchyMap.containsKey(cid)) {
+			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
+		} else {
+			CHEClass data = hierarchyMap.get(cid).getData();
+			classNameSet.remove(data.getName());
+			classNameSet.add(cheClass.getName());
+
+			if (StringUtils.isNotBlank(data.getPid())) {
+				hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
+			}
+			data.setName(cheClass.getName());
+			if (StringUtils.isNotBlank(data.getPid())) {
+				hierarchyMap.get(data.getPid()).getChilds().add(new Node(data, null));
+			}
+
 			return ResponseGenerator.okResponse();
 		}
 	}

@@ -3,7 +3,7 @@ package com.che.classmanager.models;
 /**
  * The model Class. It holds information of a class.
  */
-public class Class {
+public class CHEClass {
 
 	private String cid;
 	private String name;

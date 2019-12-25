@@ -7,7 +7,7 @@ import java.util.HashSet;
  */
 public class Node {
 
-	private Class data;
+	private CHEClass data;
 	private HashSet<Node> childs;
 
 	/**
@@ -16,16 +16,16 @@ public class Node {
 	 * @param data   The data
 	 * @param childs The childs
 	 */
-	public Node(Class data, HashSet<Node> childs) {
+	public Node(CHEClass data, HashSet<Node> childs) {
 		this.data = data;
 		this.childs = childs;
 	}
 
-	public Class getData() {
+	public CHEClass getData() {
 		return data;
 	}
 
-	public void setData(Class data) {
+	public void setData(CHEClass data) {
 		this.data = data;
 	}
 
