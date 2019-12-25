@@ -67,6 +67,9 @@ public class ClassController {
 		hierarchyMap.remove(node.getData().getCid());
 		classNameMap.remove(node.getData().getName());
 
+		// Removing the class in DB
+		cheRepository.delete(node.getData());
+
 		// Removing the node from its parent's list
 		String pid = node.getData().getPid();
 		if (StringUtils.isNotBlank(pid) && hierarchyMap.containsKey(pid) && hierarchyMap.get(pid).getChilds() != null) {
@@ -154,6 +157,9 @@ public class ClassController {
 		}
 		hierarchyMap.put(cid, new Node(cheClass, new HashSet<>()));
 
+		// Adding the class in DB
+		cheRepository.save(cheClass);
+
 		return ResponseGenerator.okResponse();
 	}
 
@@ -238,6 +244,9 @@ public class ClassController {
 				hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
 			}
 			hierarchyMap.put(cheClass.getCid(), new Node(cheClass, new HashSet<>()));
+
+			// Adding the class in DB
+			cheRepository.save(cheClass);
 		}
 		return ResponseGenerator.okResponse();
 
@@ -303,15 +312,21 @@ public class ClassController {
 		// Updating the class name at all places
 		CHEClass data = hierarchyMap.get(cid).getData();
 		classNameMap.remove(data.getName());
+		cheRepository.delete(data);
 		classNameMap.put(cheClass.getName(), cheClass.getCid());
 
 		if (StringUtils.isNotBlank(data.getPid())) {
 			hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
 		}
+
 		data.setName(cheClass.getName());
+		data.setPid(cheClass.getPid());
+		data.setIsAbstract(cheClass.getIsAbstract());
+
 		if (StringUtils.isNotBlank(data.getPid())) {
 			hierarchyMap.get(data.getPid()).getChilds().add(new Node(data, null));
 		}
+		cheRepository.save(cheClass);
 
 		return ResponseGenerator.okResponse();
 	}
