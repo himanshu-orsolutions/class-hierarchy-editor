@@ -134,7 +134,7 @@ public class ClassController {
 		cheClass.setName(name);
 		cheClass.setPid(pid);
 		cheClass.setIsAbstract(StringUtils.isBlank(isAbstract) ? "false" : isAbstract); // Adding default values if not
-																					// present
+		// present
 
 		// Adding the new class name in the set
 		classNameSet.add(name);
@@ -244,26 +244,34 @@ public class ClassController {
 	public ResponseEntity<String> editClasInfo(@PathVariable(value = "cid") String cid,
 			@RequestBody CHEClass cheClass) {
 
+		// Validating the input
+		if (!hierarchyMap.containsKey(cid)) {
+			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
+		}
 		if (StringUtils.isBlank(cheClass.getName())) {
 			return ResponseGenerator.generateBadRequest("The class name cannot be null/empty.");
 		}
-		if (!hierarchyMap.containsKey(cid)) {
-			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
-		} else {
-			CHEClass data = hierarchyMap.get(cid).getData();
-			classNameSet.remove(data.getName());
-			classNameSet.add(cheClass.getName());
-
-			if (StringUtils.isNotBlank(data.getPid())) {
-				hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
-			}
-			data.setName(cheClass.getName());
-			if (StringUtils.isNotBlank(data.getPid())) {
-				hierarchyMap.get(data.getPid()).getChilds().add(new Node(data, null));
-			}
-
-			return ResponseGenerator.okResponse();
+		if (!cheClass.getName().matches(IClassConstants.CLASSNAMEREGEX)) {
+			return ResponseGenerator.generateBadRequest("Invalid class name.");
 		}
+		if (classNameSet.contains(cheClass.getName())) {
+			return ResponseGenerator.generateBadRequest("The class name '" + cheClass.getName() + "' already exists.");
+		}
+
+		// Updating the class name at all places
+		CHEClass data = hierarchyMap.get(cid).getData();
+		classNameSet.remove(data.getName());
+		classNameSet.add(cheClass.getName());
+
+		if (StringUtils.isNotBlank(data.getPid())) {
+			hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
+		}
+		data.setName(cheClass.getName());
+		if (StringUtils.isNotBlank(data.getPid())) {
+			hierarchyMap.get(data.getPid()).getChilds().add(new Node(data, null));
+		}
+
+		return ResponseGenerator.okResponse();
 	}
 
 	/**
