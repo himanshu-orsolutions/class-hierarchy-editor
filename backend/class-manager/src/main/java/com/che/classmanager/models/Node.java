@@ -1,6 +1,6 @@
 package com.che.classmanager.models;
 
-import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The Node. It holds information of a class and its child classes.
@@ -8,7 +8,7 @@ import java.util.HashSet;
 public class Node {
 
 	private CHEClass data;
-	private HashSet<Node> childs;
+	private Set<Node> childs;
 
 	/**
 	 * Instantiating the node
@@ -16,7 +16,7 @@ public class Node {
 	 * @param data   The data
 	 * @param childs The childs
 	 */
-	public Node(CHEClass data, HashSet<Node> childs) {
+	public Node(CHEClass data, Set<Node> childs) {
 		this.data = data;
 		this.childs = childs;
 	}
@@ -29,17 +29,17 @@ public class Node {
 		this.data = data;
 	}
 
-	public HashSet<Node> getChilds() {
+	public Set<Node> getChilds() {
 		return childs;
 	}
 
-	public void setChilds(HashSet<Node> childs) {
+	public void setChilds(Set<Node> childs) {
 		this.childs = childs;
 	}
 
 	@Override
 	public int hashCode() {
-		return data.getCid().hashCode();
+		return data.getCid();
 	}
 
 	@Override

@@ -9,29 +9,37 @@ import javax.persistence.Id;
 /**
  * The model Class. It holds information of a class.
  */
-@Entity(name = "Classes")
+@Entity(name = "classes")
 public class CHEClass {
 
 	@Id
 	@Column(name = "cid")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String cid;
-
-	@Column(name = "name")
-	private String name;
-
-	@Column(name = "abstract")
-	private String isAbstract;
+	Integer cid;
 
 	@Column(name = "pid")
-	private String pid;
+	Integer pid;
 
-	public String getCid() {
+	@Column(name = "name")
+	String name;
+
+	@Column(name = "abstract")
+	Boolean isAbstract;
+
+	public Integer getCid() {
 		return cid;
 	}
 
-	public void setCid(String cid) {
+	public void setCid(Integer cid) {
 		this.cid = cid;
+	}
+
+	public Integer getPid() {
+		return pid;
+	}
+
+	public void setPid(Integer pid) {
+		this.pid = pid;
 	}
 
 	public String getName() {
@@ -42,26 +50,23 @@ public class CHEClass {
 		this.name = name;
 	}
 
-	public String getIsAbstract() {
+	public Boolean getIsAbstract() {
 		return isAbstract;
 	}
 
-	public void setIsAbstract(String isAbstract) {
+	public void setIsAbstract(Boolean isAbstract) {
 		this.isAbstract = isAbstract;
 	}
 
-	public String getPid() {
-		return pid;
-	}
-
-	public void setPid(String pid) {
+	public CHEClass(Integer cid, Integer pid, String name, Boolean isAbstract) {
+		super();
+		this.cid = cid;
 		this.pid = pid;
+		this.name = name;
+		this.isAbstract = isAbstract;
 	}
 
-	/**
-	 * GEts the string representation of the Class
-	 */
-	public String toString() {
-		return cid;
+	public CHEClass() {
+
 	}
 }

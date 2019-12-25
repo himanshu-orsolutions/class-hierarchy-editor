@@ -45,12 +45,12 @@ public class ClassController {
 	/**
 	 * The map of current class names
 	 */
-	private Map<String, String> classNameMap = new HashMap<>();
+	public static Map<String, Integer> classNameMap = new HashMap<>();
 
 	/**
 	 * The class hierarchy map
 	 */
-	private Map<String, Node> hierarchyMap = new HashMap<>();
+	public static Map<Integer, Node> hierarchyMap = new HashMap<>();
 
 	/**
 	 * Removes the class node and all its sub-class nodes from the hierarchy
@@ -71,8 +71,8 @@ public class ClassController {
 		cheRepository.delete(node.getData());
 
 		// Removing the node from its parent's list
-		String pid = node.getData().getPid();
-		if (StringUtils.isNotBlank(pid) && hierarchyMap.containsKey(pid) && hierarchyMap.get(pid).getChilds() != null) {
+		int pid = node.getData().getPid();
+		if (pid != 0 && hierarchyMap.containsKey(pid) && hierarchyMap.get(pid).getChilds() != null) {
 			hierarchyMap.get(pid).getChilds().remove(node);
 		}
 
@@ -92,7 +92,7 @@ public class ClassController {
 		output.put("cid", node.getData().getCid());
 		output.put("name", node.getData().getName());
 		List<Document> childClassesInfo = new ArrayList<>();
-		HashSet<Node> childNodes = node.getChilds();
+		Set<Node> childNodes = node.getChilds();
 
 		if (childNodes == null) {
 			return;
@@ -118,15 +118,12 @@ public class ClassController {
 	 * @return The insertion status
 	 */
 	@GetMapping(value = "/addclass", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> addNewClass(@RequestParam(value = "cid", required = true) String cid,
+	public ResponseEntity<String> addNewClass(@RequestParam(value = "cid", required = true) Integer cid,
 			@RequestParam(value = "name", required = true) String name,
-			@RequestParam(value = "abstract", required = false) String isAbstract,
-			@RequestParam(value = "pid", required = false) String pid) {
+			@RequestParam(value = "abstract", required = false) Boolean isAbstract,
+			@RequestParam(value = "pid", required = false) Integer pid) {
 
 		// Validating the input
-		if (!cid.matches(IClassConstants.CLASSIDREGEX)) {
-			return ResponseGenerator.generateBadRequest("Invalid class ID.");
-		}
 		if (!name.matches(IClassConstants.CLASSNAMEREGEX)) {
 			return ResponseGenerator.generateBadRequest("Invalid class name.");
 		}
@@ -136,23 +133,18 @@ public class ClassController {
 		if (classNameMap.containsKey(name)) {
 			return ResponseGenerator.generateBadRequest("The class name '" + name + "' already exists.");
 		}
-		if (StringUtils.isNotBlank(pid) && !hierarchyMap.containsKey(pid)) {
+		if (pid != null && !hierarchyMap.containsKey(pid)) {
 			return ResponseGenerator.generateBadRequest("The pid '" + pid + "' not found.");
 		}
 
 		// Creating the new class instance
-		CHEClass cheClass = new CHEClass();
-		cheClass.setCid(cid);
-		cheClass.setName(name);
-		cheClass.setPid(pid);
-		cheClass.setIsAbstract(StringUtils.isBlank(isAbstract) ? "false" : isAbstract); // Adding default values if not
-		// present
+		CHEClass cheClass = new CHEClass(cid, pid, name, isAbstract == null ? false : true);
 
 		// Adding the new class name in the set
 		classNameMap.put(name, cid);
 
 		// Adding the class into the hierarchy map
-		if (StringUtils.isNotBlank(pid)) {
+		if (pid != 0) {
 			hierarchyMap.get(pid).getChilds().add(new Node(cheClass, null));
 		}
 		hierarchyMap.put(cid, new Node(cheClass, new HashSet<>()));
@@ -207,11 +199,8 @@ public class ClassController {
 
 		// Validating the input
 		for (CHEClass cheClass : container.getClasses()) {
-			if (StringUtils.isAnyBlank(cheClass.getCid(), cheClass.getName())) {
-				return ResponseGenerator.generateBadRequest("The cid/ name cannot be null/empty.");
-			}
-			if (!cheClass.getCid().matches(IClassConstants.CLASSIDREGEX)) {
-				return ResponseGenerator.generateBadRequest("Invalid class ID: " + cheClass.getCid());
+			if (cheClass.getCid() == null || StringUtils.isBlank(cheClass.getName())) {
+				return ResponseGenerator.generateBadRequest("The cid/name cannot be null/empty.");
 			}
 			if (!cheClass.getName().matches(IClassConstants.CLASSNAMEREGEX)) {
 				return ResponseGenerator.generateBadRequest("Invalid class name: " + cheClass.getName());
@@ -223,13 +212,13 @@ public class ClassController {
 				return ResponseGenerator
 						.generateBadRequest("The class name '" + cheClass.getName() + "' already exists.");
 			}
-			if (StringUtils.isNotBlank(cheClass.getPid()) && !hierarchyMap.containsKey(cheClass.getPid())) {
+			if (cheClass.getPid() != 0 && !hierarchyMap.containsKey(cheClass.getPid())) {
 				return ResponseGenerator.generateBadRequest("The pid '" + cheClass.getPid() + "' not found.");
 			}
 
 			// Adding the default value if not present
-			if (StringUtils.isBlank(cheClass.getIsAbstract())) {
-				cheClass.setIsAbstract("false");
+			if (cheClass.getIsAbstract() == null) {
+				cheClass.setIsAbstract(false);
 			}
 		}
 
@@ -240,7 +229,7 @@ public class ClassController {
 			classNameMap.put(cheClass.getName(), cheClass.getCid());
 
 			// Adding the class into the hierarchy map
-			if (StringUtils.isNotBlank(cheClass.getPid())) {
+			if (cheClass.getPid() != 0) {
 				hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
 			}
 			hierarchyMap.put(cheClass.getCid(), new Node(cheClass, new HashSet<>()));
@@ -259,7 +248,7 @@ public class ClassController {
 	 * @return The class information
 	 */
 	@GetMapping(value = "/getclass/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getClassInfo(@PathVariable(value = "cid") String cid) {
+	public ResponseEntity<?> getClassInfo(@PathVariable(value = "cid") Integer cid) {
 
 		if (hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.okResponse(hierarchyMap.get(cid).getData());
@@ -275,7 +264,7 @@ public class ClassController {
 	 * @return The deletion status
 	 */
 	@GetMapping(value = "/deleteclass/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> deleteClassInfo(@PathVariable(value = "cid") String cid) {
+	public ResponseEntity<String> deleteClassInfo(@PathVariable(value = "cid") Integer cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
@@ -292,7 +281,7 @@ public class ClassController {
 	 * @return The updation status
 	 */
 	@PutMapping(value = "/editclass/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> editClasInfo(@PathVariable(value = "cid") String cid,
+	public ResponseEntity<String> editClasInfo(@PathVariable(value = "cid") Integer cid,
 			@RequestBody CHEClass cheClass) {
 
 		// Validating the input
@@ -315,7 +304,7 @@ public class ClassController {
 		cheRepository.delete(data);
 		classNameMap.put(cheClass.getName(), cheClass.getCid());
 
-		if (StringUtils.isNotBlank(data.getPid())) {
+		if (data.getPid() != 0) {
 			hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
 		}
 
@@ -323,7 +312,7 @@ public class ClassController {
 		data.setPid(cheClass.getPid());
 		data.setIsAbstract(cheClass.getIsAbstract());
 
-		if (StringUtils.isNotBlank(data.getPid())) {
+		if (data.getPid() != 0) {
 			hierarchyMap.get(data.getPid()).getChilds().add(new Node(data, null));
 		}
 		cheRepository.save(cheClass);
@@ -338,7 +327,7 @@ public class ClassController {
 	 * @return The information
 	 */
 	@GetMapping(value = "/superclasses/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getSuperClassesInfo(@PathVariable(value = "cid") String cid) {
+	public ResponseEntity<?> getSuperClassesInfo(@PathVariable(value = "cid") Integer cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
@@ -347,8 +336,8 @@ public class ClassController {
 			List<Document> list = new ArrayList<>();
 			Node currentNode = hierarchyMap.get(cid);
 
-			while (StringUtils.isNotBlank(currentNode.getData().getPid())) { // Iterating over all the parent classes
-				String pid = currentNode.getData().getPid();
+			while (currentNode.getData().getPid() != 0) { // Iterating over all the parent classes
+				Integer pid = currentNode.getData().getPid();
 				currentNode = hierarchyMap.get(pid);
 				list.add(new Document("cid", currentNode.getData().getCid()).append("name",
 						currentNode.getData().getName()));
@@ -366,7 +355,7 @@ public class ClassController {
 	 * @return The information
 	 */
 	@GetMapping(value = "/subclasses/{cid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getSubClassesInfo(@PathVariable(value = "cid") String cid) {
+	public ResponseEntity<?> getSubClassesInfo(@PathVariable(value = "cid") Integer cid) {
 
 		if (!hierarchyMap.containsKey(cid)) {
 			return ResponseGenerator.generateBadRequest("The cid " + cid + " does not exist");
