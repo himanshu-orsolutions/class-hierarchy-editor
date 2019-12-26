@@ -1,0 +1,20 @@
+.root {
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
+  }
+
+  button {
+    padding: 5px;
+
+    visibility: hidden;
+  }
+
+  p {
+    margin-right: 1rem;
+  }
+}
