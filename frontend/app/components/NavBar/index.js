@@ -25,7 +25,7 @@ function NavBar() {
     e.preventDefault();
   };
 
-  const [isAddFormOpen, setisAddFormOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
   const onSearchTextChange = e => {
     console.log(e.target.value);
@@ -54,19 +54,15 @@ function NavBar() {
               />
             </div>
           </form>
-          <Button size="small" onClick={() => setisAddFormOpen(true)}>
+          <Button size="small" onClick={() => setIsAddFormOpen(true)}>
             Add class
           </Button>
         </Toolbar>
       </AppBar>
-      <Modal
-        open={isAddFormOpen}
-        onClose={() => setisAddFormOpen(false)}
-        className={styles.modal}
-      >
+      <Modal open={isAddFormOpen} className={styles.modal}>
         <Grow in={isAddFormOpen} timeout={500}>
           <div className={styles.content}>
-            <ClassForm />
+            <ClassForm type="Add" setIsFormOpen={setIsAddFormOpen} />
           </div>
         </Grow>
       </Modal>

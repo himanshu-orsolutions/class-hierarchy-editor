@@ -5,14 +5,16 @@
  */
 
 import React, { memo } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { Switch, Route } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
-import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import HomePage from 'containers/HomePage';
+import axios from 'axios';
+import { SERVER_BASE_URL } from 'global-constants';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
@@ -24,6 +26,8 @@ export function Root(/* dispatch */) {
   useInjectReducer({ key: 'root', reducer });
   useInjectSaga({ key: 'root', saga });
 
+  axios.defaults.baseURL = SERVER_BASE_URL;
+
   return (
     <div>
       <Helmet>
@@ -33,6 +37,17 @@ export function Root(/* dispatch */) {
       <Switch>
         <Route path="/" component={HomePage} />
       </Switch>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnVisibilityChange
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }
