@@ -2,8 +2,6 @@ package com.che.classmanager.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -14,7 +12,6 @@ public class CHEClass {
 
 	@Id
 	@Column(name = "cid")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer cid;
 
 	@Column(name = "pid")

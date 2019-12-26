@@ -44,10 +44,7 @@ public class StartupListener implements ApplicationListener<ApplicationStartedEv
 		cheClasses.forEach(cheClass -> { // Iterating over the existing classes and initializing the hierarchy map
 			ClassController.classNameMap.put(cheClass.getName(), cheClass.getCid());
 			ClassController.hierarchyMap.put(cheClass.getCid(), new Node(cheClass, new HashSet<>()));
-
-			if (cheClass.getPid() != 0) { // The child class
-				ClassController.hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
-			}
+			ClassController.hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, new HashSet<>()));
 		});
 	}
 }
