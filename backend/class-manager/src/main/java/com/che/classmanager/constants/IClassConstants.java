@@ -11,11 +11,6 @@ public interface IClassConstants {
 	public static final String CLASSNAMEREGEX = "^[A-Z][a-zA-Z0-9]*$";
 
 	/**
-	 * The class ID regex
-	 */
-	public static final String CLASSIDREGEX = "^[\\d]+$";
-
-	/**
 	 * The search tag regex
 	 */
 	public static final String SEARCHTAGREGEX = "^[\\w ]+$";

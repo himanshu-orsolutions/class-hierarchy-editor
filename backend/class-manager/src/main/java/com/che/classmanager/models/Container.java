@@ -3,7 +3,7 @@ package com.che.classmanager.models;
 import java.util.List;
 
 /**
- * The class Container. It holds the list of classes.
+ * The model Container. It holds the list of classes.
  */
 public class Container {
 

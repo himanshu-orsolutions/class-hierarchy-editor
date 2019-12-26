@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
- * The model Class. It holds information of a class.
+ * The model CHEClass. It holds information of a class.
  */
 @Entity(name = "classes")
 public class CHEClass {

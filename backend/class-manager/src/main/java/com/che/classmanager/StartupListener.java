@@ -13,24 +13,39 @@ import com.che.classmanager.models.CHEClass;
 import com.che.classmanager.models.Node;
 import com.che.classmanager.repositories.CHERepository;
 
+/**
+ * The StartupListener. It listens to events at application startup.
+ */
 @Component
 public class StartupListener implements ApplicationListener<ApplicationStartedEvent> {
 
+	/**
+	 * The CHE repository
+	 */
 	@Autowired
 	CHERepository cheRepository;
 
+	/**
+	 * Triggers at when the application is started
+	 * 
+	 * @param event The event
+	 */
 	@Override
 	public void onApplicationEvent(ApplicationStartedEvent event) {
 
 		// Initializing the hierarchy map and class name map
 		List<CHEClass> cheClasses = cheRepository.findAll();
 
-		cheClasses.forEach(cheClass -> {
-			// Adding the class into the hierarchy map and class name set
+		// Adding the top class with cid 0
+		CHEClass rootClass = new CHEClass(0, -1, "Root", true);
+		ClassController.classNameMap.put("Root", 0);
+		ClassController.hierarchyMap.put(0, new Node(rootClass, new HashSet<>()));
+
+		cheClasses.forEach(cheClass -> { // Iterating over the existing classes and initializing the hierarchy map
 			ClassController.classNameMap.put(cheClass.getName(), cheClass.getCid());
 			ClassController.hierarchyMap.put(cheClass.getCid(), new Node(cheClass, new HashSet<>()));
 
-			if (cheClass.getPid() != 0) {
+			if (cheClass.getPid() != 0) { // The child class
 				ClassController.hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
 			}
 		});

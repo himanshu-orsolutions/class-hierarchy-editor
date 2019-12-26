@@ -63,20 +63,15 @@ public class ClassController {
 			return;
 		}
 
-		// Removing the node from hierarchy map and class name set
+		// Removing the node from hierarchy map, class name set, and the parent's list
 		hierarchyMap.remove(node.getData().getCid());
 		classNameMap.remove(node.getData().getName());
+		hierarchyMap.get(node.getData().getPid()).getChilds().remove(node);
 
 		// Removing the class in DB
 		cheRepository.delete(node.getData());
 
-		// Removing the node from its parent's list
-		int pid = node.getData().getPid();
-		if (pid != 0 && hierarchyMap.containsKey(pid) && hierarchyMap.get(pid).getChilds() != null) {
-			hierarchyMap.get(pid).getChilds().remove(node);
-		}
-
-		if (node.getChilds() != null) {
+		if (node.getChilds() != null) { // Iterating over the child classes
 			node.getChilds().forEach(child -> removeNode(child));
 		}
 	}
@@ -138,15 +133,13 @@ public class ClassController {
 		}
 
 		// Creating the new class instance
-		CHEClass cheClass = new CHEClass(cid, pid, name, isAbstract == null ? false : true);
+		CHEClass cheClass = new CHEClass(cid, pid == null ? 0 : pid, name, isAbstract == null ? false : true);
 
-		// Adding the new class name in the set
+		// Adding the new class name in the map
 		classNameMap.put(name, cid);
 
 		// Adding the class into the hierarchy map
-		if (pid != 0) {
-			hierarchyMap.get(pid).getChilds().add(new Node(cheClass, null));
-		}
+		hierarchyMap.get(pid).getChilds().add(new Node(cheClass, new HashSet<>()));
 		hierarchyMap.put(cid, new Node(cheClass, new HashSet<>()));
 
 		// Adding the class in DB
@@ -212,7 +205,7 @@ public class ClassController {
 				return ResponseGenerator
 						.generateBadRequest("The class name '" + cheClass.getName() + "' already exists.");
 			}
-			if (cheClass.getPid() != 0 && !hierarchyMap.containsKey(cheClass.getPid())) {
+			if (cheClass.getPid() != null && !hierarchyMap.containsKey(cheClass.getPid())) {
 				return ResponseGenerator.generateBadRequest("The pid '" + cheClass.getPid() + "' not found.");
 			}
 
@@ -220,18 +213,19 @@ public class ClassController {
 			if (cheClass.getIsAbstract() == null) {
 				cheClass.setIsAbstract(false);
 			}
+			if (cheClass.getPid() == null) {
+				cheClass.setPid(0);
+			}
 		}
 
 		// Adding all classes
 		for (CHEClass cheClass : container.getClasses()) {
 
-			// Adding the new class name in the set
+			// Adding the new class name in the map
 			classNameMap.put(cheClass.getName(), cheClass.getCid());
 
 			// Adding the class into the hierarchy map
-			if (cheClass.getPid() != 0) {
-				hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
-			}
+			hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
 			hierarchyMap.put(cheClass.getCid(), new Node(cheClass, new HashSet<>()));
 
 			// Adding the class in DB
@@ -301,20 +295,12 @@ public class ClassController {
 		// Updating the class name at all places
 		CHEClass data = hierarchyMap.get(cid).getData();
 		classNameMap.remove(data.getName());
+		hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
 		cheRepository.delete(data);
+
+		// Adding the updated class information
 		classNameMap.put(cheClass.getName(), cheClass.getCid());
-
-		if (data.getPid() != 0) {
-			hierarchyMap.get(data.getPid()).getChilds().remove(new Node(data, null));
-		}
-
-		data.setName(cheClass.getName());
-		data.setPid(cheClass.getPid());
-		data.setIsAbstract(cheClass.getIsAbstract());
-
-		if (data.getPid() != 0) {
-			hierarchyMap.get(data.getPid()).getChilds().add(new Node(data, null));
-		}
+		hierarchyMap.get(cheClass.getPid()).getChilds().add(new Node(cheClass, null));
 		cheRepository.save(cheClass);
 
 		return ResponseGenerator.okResponse();
