@@ -41,3 +41,15 @@
     padding: 0.3rem 1rem;
   }
 }
+
+.modal {
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .content {
+    background-color: #fff;
+    padding: 2rem;
+  }
+}
