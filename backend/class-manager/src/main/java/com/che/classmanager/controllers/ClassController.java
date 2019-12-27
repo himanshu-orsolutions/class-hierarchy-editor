@@ -89,8 +89,12 @@ public class ClassController {
 	 */
 	private void recursiveRetrieval(Node node, Document output) {
 
+		// Setting the class information
 		output.put("cid", node.getData().getCid());
+		output.put("pid", node.getData().getPid());
 		output.put("name", node.getData().getName());
+		output.put("isAbstract", node.getData().getIsAbstract());
+
 		List<Document> childClassesInfo = new ArrayList<>();
 		Set<Node> childNodes = node.getChilds();
 
