@@ -20,9 +20,26 @@ import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
 
-export function HierarchyViewer() {
+export function HierarchyViewer({ dispatch, state }) {
   useInjectReducer({ key: 'hierarchyViewer', reducer });
   useInjectSaga({ key: 'hierarchyViewer', saga });
+
+  console.log(state);
+
+  const getTree = data => {
+    if (data) {
+      return data.map(treeNode => (
+        <CustomTreeItem
+          nodeId={treeNode.cid}
+          label={treeNode.name}
+          key={treeNode.cid}
+        >
+          {getTree(treeNode.superclassOf)}
+        </CustomTreeItem>
+      ));
+    }
+    return undefined;
+  };
 
   return (
     <div className={styles.root}>
@@ -31,13 +48,15 @@ export function HierarchyViewer() {
         <meta name="description" content="Description of HierarchyViewer" />
       </Helmet>
       <div>
-        <TreeView
-          defaultExpanded={['1']}
-          defaultCollapseIcon={<MinusSquare />}
-          defaultExpandIcon={<PlusSquare />}
-          defaultEndIcon={<CloseSquare />}
-        >
-          <CustomTreeItem nodeId="1" label="Main">
+        {state ? (
+          <TreeView
+            defaultExpanded={['1']}
+            defaultCollapseIcon={<MinusSquare />}
+            defaultExpandIcon={<PlusSquare />}
+            defaultEndIcon={<CloseSquare />}
+          >
+            {getTree(state.treeData.superclassOf)}
+            {/* <CustomTreeItem nodeId="1" label="Main">
             <CustomTreeItem nodeId="2" label="Hello" />
             <CustomTreeItem nodeId="3" label="Subtree with children">
               <CustomTreeItem nodeId="6" label="Hello" />
@@ -50,8 +69,11 @@ export function HierarchyViewer() {
             </CustomTreeItem>
             <CustomTreeItem nodeId="4" label="World" />
             <CustomTreeItem nodeId="5" label="Something something" />
-          </CustomTreeItem>
-        </TreeView>
+          </CustomTreeItem> */}
+          </TreeView>
+        ) : (
+          ''
+        )}
       </div>
     </div>
   );
@@ -62,7 +84,7 @@ HierarchyViewer.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  hierarchyViewer: makeSelectHierarchyViewer(),
+  state: makeSelectHierarchyViewer(),
 });
 
 function mapDispatchToProps(dispatch) {

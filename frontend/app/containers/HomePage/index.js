@@ -10,7 +10,7 @@ import { Helmet } from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import NavBar from 'components/NavBar/index';
-import { HierarchyViewer } from 'containers/HierarchyViewer/index';
+import HierarchyViewer from 'containers/HierarchyViewer';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';

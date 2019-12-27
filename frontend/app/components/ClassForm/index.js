@@ -10,9 +10,9 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@material-ui/core';
+import { successToast } from 'utils/toast';
 import { string, number, boolean, object } from 'yup';
 import styles from './styles.scss';
-import { successToast } from 'utils/toast';
 
 function ClassForm({
   values,
