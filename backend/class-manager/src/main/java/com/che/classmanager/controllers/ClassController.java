@@ -89,8 +89,12 @@ public class ClassController {
 	 */
 	private void recursiveRetrieval(Node node, Document output) {
 
+		// Setting the class information
 		output.put("cid", node.getData().getCid());
+		output.put("pid", node.getData().getPid());
 		output.put("name", node.getData().getName());
+		output.put("isAbstract", node.getData().getIsAbstract());
+
 		List<Document> childClassesInfo = new ArrayList<>();
 		Set<Node> childNodes = node.getChilds();
 
@@ -120,8 +124,8 @@ public class ClassController {
 	@GetMapping(value = "/addclass", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addNewClass(@RequestParam(value = "cid", required = true) Integer cid,
 			@RequestParam(value = "name", required = true) String name,
-			@RequestParam(value = "abstract", required = false) Boolean isAbstract,
-			@RequestParam(value = "pid", required = false) Integer pid) {
+			@RequestParam(value = "abstract", defaultValue = "false") Boolean isAbstract,
+			@RequestParam(value = "pid", defaultValue = "0") Integer pid) {
 
 		// Validating the input
 		if (!name.matches(IClassConstants.CLASSNAMEREGEX)) {
@@ -133,12 +137,12 @@ public class ClassController {
 		if (classNameMap.containsKey(name)) {
 			return ResponseGenerator.generateBadRequest("The class name '" + name + "' already exists.");
 		}
-		if (pid != null && !hierarchyMap.containsKey(pid)) {
+		if (!hierarchyMap.containsKey(pid)) {
 			return ResponseGenerator.generateBadRequest("The pid '" + pid + "' not found.");
 		}
 
 		// Creating the new class instance
-		CHEClass cheClass = new CHEClass(cid, pid == null ? 0 : pid, name, isAbstract == null ? false : true);
+		CHEClass cheClass = new CHEClass(cid, pid, name, isAbstract);
 
 		// Adding the new class name in the map
 		classNameMap.put(name, cid);
