@@ -1,3 +1,10 @@
 .root {
   padding: 1rem;
+
+  :global {
+    .MuiCircularProgress-colorPrimary {
+      margin-left: 1rem;
+      margin-top: 1rem;
+    }
+  }
 }

@@ -4,13 +4,14 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import TreeView from '@material-ui/lab/TreeView';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
@@ -19,10 +20,15 @@ import makeSelectHierarchyViewer from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
+import { startLoadingTreeData } from './actions';
 
-export function HierarchyViewer({ state }) {
+export function HierarchyViewer({ state, dispatch }) {
   useInjectReducer({ key: 'hierarchyViewer', reducer });
   useInjectSaga({ key: 'hierarchyViewer', saga });
+
+  useEffect(() => {
+    dispatch(startLoadingTreeData(0));
+  }, []);
 
   const getTree = data => {
     if (data) {
@@ -31,6 +37,8 @@ export function HierarchyViewer({ state }) {
           nodeId={treeNode.cid}
           label={treeNode.name}
           key={treeNode.cid}
+          pid={treeNode.pid}
+          abstract={treeNode.abstract}
         >
           {getTree(treeNode.superclassOf)}
         </CustomTreeItem>
@@ -46,7 +54,7 @@ export function HierarchyViewer({ state }) {
         <meta name="description" content="Description of HierarchyViewer" />
       </Helmet>
       <div>
-        {state ? (
+        {state && !state.isLoading ? (
           <TreeView
             defaultExpanded={['1']}
             defaultCollapseIcon={<MinusSquare />}
@@ -56,7 +64,7 @@ export function HierarchyViewer({ state }) {
             {getTree(state.treeData.superclassOf)}
           </TreeView>
         ) : (
-          ''
+          <CircularProgress />
         )}
       </div>
     </div>

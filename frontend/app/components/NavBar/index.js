@@ -19,7 +19,7 @@ import ClassForm from 'components/ClassForm';
 
 import styles from './styles.scss';
 
-function NavBar() {
+function NavBar({ dispatch }) {
   const handleSubmit = e => {
     console.log(e);
     e.preventDefault();
@@ -62,7 +62,11 @@ function NavBar() {
       <Modal open={isAddFormOpen} className={styles.modal}>
         <Grow in={isAddFormOpen} timeout={500}>
           <div className={styles.content}>
-            <ClassForm type="Add" setIsFormOpen={setIsAddFormOpen} />
+            <ClassForm
+              type="Add"
+              setIsFormOpen={setIsAddFormOpen}
+              dispatch={dispatch}
+            />
           </div>
         </Grow>
       </Modal>

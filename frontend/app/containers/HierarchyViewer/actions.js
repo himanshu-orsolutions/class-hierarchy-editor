@@ -4,10 +4,35 @@
  *
  */
 
-import { DEFAULT_ACTION } from './constants';
+import {
+  START_LOADING_TREE_DATA,
+  START_LOADER,
+  STOP_LOADER,
+  SET_TREE_DATA,
+} from './constants';
 
-export function defaultAction() {
+export function startLoadingTreeData(data) {
   return {
-    type: DEFAULT_ACTION,
+    type: START_LOADING_TREE_DATA,
+    data,
+  };
+}
+
+export function setTreeData(data) {
+  return {
+    type: SET_TREE_DATA,
+    data,
+  };
+}
+
+export function startLoader() {
+  return {
+    type: START_LOADER,
+  };
+}
+
+export function stopLoader() {
+  return {
+    type: STOP_LOADER,
   };
 }

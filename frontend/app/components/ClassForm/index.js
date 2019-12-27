@@ -10,9 +10,10 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@material-ui/core';
-import { successToast } from 'utils/toast';
+import { successToast, errorToast } from 'utils/toast';
 import { string, number, boolean, object } from 'yup';
 import styles from './styles.scss';
+import { startLoadingTreeData } from 'containers/HierarchyViewer/actions';
 
 function ClassForm({
   values,
@@ -38,16 +39,14 @@ function ClassForm({
           <FormHelperText>{touched.cid ? errors.cid : ''}</FormHelperText>
         </FormControl>
         <FormControl variant="outlined">
-          <InputLabel htmlFor="className">Class Name</InputLabel>
+          <InputLabel htmlFor="name">Class Name</InputLabel>
           <OutlinedInput
-            id="className"
-            value={values.className}
+            id="name"
+            value={values.name}
             onChange={handleChange}
-            error={touched.className && Boolean(errors.className)}
+            error={touched.name && Boolean(errors.name)}
           />
-          <FormHelperText>
-            {touched.className ? errors.className : ''}
-          </FormHelperText>
+          <FormHelperText>{touched.name ? errors.name : ''}</FormHelperText>
         </FormControl>
         <FormControl variant="outlined">
           <InputLabel htmlFor="pid">Parent ID</InputLabel>
@@ -60,15 +59,15 @@ function ClassForm({
           <FormHelperText>{touched.pid ? errors.pid : ''}</FormHelperText>
         </FormControl>
         <FormControlLabel
-          value="isAbstract"
+          value="abstract"
           control={
             <Checkbox
               defaultChecked
               color="primary"
-              id="isAbstract"
-              value={values.isAbstract}
+              id="abstract"
+              value={values.abstract}
               onChange={handleChange}
-              error={touched.title && Boolean(errors.isAbstract)}
+              error={touched.title && Boolean(errors.abstract)}
             />
           }
           label="Abstract"
@@ -98,11 +97,11 @@ function ClassForm({
 }
 
 const Formik = withFormik({
-  mapPropsToValues: ({ className, pid, isAbstract, cid }) => ({
+  mapPropsToValues: ({ name, pid, abstract, cid }) => ({
     cid: cid || undefined,
-    className: className || undefined,
+    name: name || undefined,
     pid: pid || undefined,
-    isAbstract: isAbstract || false,
+    abstract: abstract || false,
   }),
 
   validationSchema: object().shape({
@@ -111,20 +110,20 @@ const Formik = withFormik({
       .required('Class ID is required')
       .integer('cid must be integer value'),
 
-    className: string()
+    name: string()
       .required('Class name is required')
       .matches(/^[A-Z][a-zA-Z0-9]*$/, 'Invalid class name'),
     pid: number()
       .typeError('cid must be integer value')
       .integer('Pid must be integer value'),
-    isAbstract: boolean(),
+    abstract: boolean(),
   }),
 
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, setSubmitting }) => {
     const data = {
       cid: values.cid,
-      name: values.className,
-      abstract: values.isAbstract,
+      name: values.name,
+      abstract: values.abstract,
       pid: values.pid,
     };
 
@@ -136,13 +135,33 @@ const Formik = withFormik({
         .then(() => {
           successToast('New class added successfully');
           props.setIsFormOpen(false);
+          props.dispatch(startLoadingTreeData(0));
         })
         .catch(error => {
-          console.log(error);
+          if (error.response && error.response.data) {
+            errorToast(error.response.data.message);
+          } else {
+            errorToast('Error occured while adding new class!!');
+          }
+          setSubmitting(false);
         });
     } else if (props.type.toLowerCase() === 'edit') {
       data.taskId = props.taskId;
-      // props.dispatch(startEditTodoAction(data));
+      axios
+        .put(`cheditor/api/editclass/${values.cid}`, data)
+        .then(() => {
+          successToast('Class updated successfully');
+          props.setIsFormOpen(false);
+          props.dispatch(startLoadingTreeData(0));
+        })
+        .catch(error => {
+          if (error.response && error.response.data) {
+            errorToast(error.response.data.message);
+          } else {
+            errorToast('Error occured while updating the class!!');
+          }
+          setSubmitting(false);
+        });
     }
   },
 })(ClassForm);

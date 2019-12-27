@@ -19,7 +19,7 @@ import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
 
-export function HomePage() {
+export function HomePage({ dispatch }) {
   useInjectReducer({ key: 'homePage', reducer });
   useInjectSaga({ key: 'homePage', saga });
 
@@ -29,15 +29,13 @@ export function HomePage() {
         <title>HomePage</title>
         <meta name="description" content="Description of HomePage" />
       </Helmet>
-      <NavBar />
+      <NavBar dispatch={dispatch} />
       <HierarchyViewer />
     </div>
   );
 }
 
-HomePage.propTypes = {
-  // dispatch: PropTypes.func.isRequired,
-};
+HomePage.propTypes = {};
 
 const mapStateToProps = createStructuredSelector({
   homePage: makeSelectHomePage(),

@@ -4,14 +4,21 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import { fade, withStyles } from '@material-ui/core/styles';
 import TreeItem from '@material-ui/lab/TreeItem';
-import { Collapse, Typography, IconButton, Button } from '@material-ui/core';
+import {
+  Collapse,
+  Typography,
+  IconButton,
+  Button,
+  Modal,
+  Grow,
+} from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -20,6 +27,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { useSpring, animated } from 'react-spring/web.cjs'; // web.cjs is required for IE 11 support
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import ClassForm from 'components/ClassForm';
+import axios from 'axios';
+import { successToast, errorToast } from 'utils/toast';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
@@ -27,24 +37,62 @@ import makeSelectCustomTreeItem from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
-import { useState } from 'react';
+import { startLoadingTreeData } from '../actions';
 
 export function CustomTreeItem(props) {
+  const [isDeleteDialogOpen, setisDeleteDialogOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   useInjectReducer({ key: 'customTreeItem', reducer });
   useInjectSaga({ key: 'customTreeItem', saga });
 
-  const [isDeleteDialogOpen, setisDeleteDialogOpen] = useState(false);
-
   const deleteClass = () => {
-    console.log(`Delete `, props);
+    setIsDeleting(true);
+    axios
+      .get(`cheditor/api/deleteclass/${props.nodeId}`)
+      .then(() => {
+        successToast('Class deleted successfully');
+        setisDeleteDialogOpen(false);
+        props.dispatch(startLoadingTreeData(0));
+      })
+      .catch(error => {
+        if (error.response && error.response.data) {
+          errorToast(error.response.data.message);
+        } else {
+          errorToast('Error occured while updating the class!!');
+        }
+        setIsDeleting(false);
+      });
   };
 
   return (
     <>
+      {/* Tree node */}
       <StyledTreeItem
         {...props}
         setisDeleteDialogOpen={setisDeleteDialogOpen}
+        setIsFormOpen={setIsFormOpen}
       />
+
+      {/* Edit form modal */}
+      <Modal open={isFormOpen} className={styles.modal}>
+        <Grow in={isFormOpen} timeout={500}>
+          <div className={styles.content}>
+            <ClassForm
+              type="Edit"
+              setIsFormOpen={setIsFormOpen}
+              cid={props.nodeId}
+              name={props.label}
+              pid={props.pid}
+              abstract={props.abstract}
+              dispatch={props.dispatch}
+            />
+          </div>
+        </Grow>
+      </Modal>
+
+      {/* Delete dialog */}
       <Dialog open={isDeleteDialogOpen}>
         <DialogTitle id="id-delete-dialog">
           Delete "{props.label}" class
@@ -55,10 +103,19 @@ export function CustomTreeItem(props) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setisDeleteDialogOpen(false)} color="primary">
+          <Button
+            onClick={() => setisDeleteDialogOpen(false)}
+            color="primary"
+            disabled={isDeleting}
+          >
             Cancel
           </Button>
-          <Button onClick={deleteClass} color="secondary" autoFocus>
+          <Button
+            onClick={deleteClass}
+            color="secondary"
+            autoFocus
+            disabled={isDeleting}
+          >
             Delete !
           </Button>
         </DialogActions>
@@ -122,7 +179,14 @@ const StyledTreeItem = withStyles(theme => ({
               className={styles.deleteBtn}
             />
           </IconButton>
-          <IconButton aria-label="delete" className={styles.editBtn}>
+          <IconButton
+            aria-label="delete"
+            className={styles.editBtn}
+            onClick={e => {
+              props.setIsFormOpen(true);
+              e.stopPropagation();
+            }}
+          >
             <EditIcon color="inherit" fontSize="small" />
           </IconButton>
         </div>
