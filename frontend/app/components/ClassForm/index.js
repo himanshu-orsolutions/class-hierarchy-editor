@@ -10,10 +10,10 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@material-ui/core';
+import { startLoadingTreeData } from 'containers/HierarchyViewer/actions';
 import { successToast, errorToast } from 'utils/toast';
 import { string, number, boolean, object } from 'yup';
 import styles from './styles.scss';
-import { startLoadingTreeData } from 'containers/HierarchyViewer/actions';
 
 function ClassForm({
   values,
@@ -35,6 +35,7 @@ function ClassForm({
             value={values.cid}
             onChange={handleChange}
             error={touched.cid && Boolean(errors.cid)}
+            disabled={type === 'Edit'}
           />
           <FormHelperText>{touched.cid ? errors.cid : ''}</FormHelperText>
         </FormControl>
