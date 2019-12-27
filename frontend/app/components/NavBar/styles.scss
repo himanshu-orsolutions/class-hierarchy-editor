@@ -47,9 +47,32 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: auto;
 
   .content {
     background-color: #fff;
     padding: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .root {
+    :global {
+      .MuiToolbar-root {
+        flex-direction: column;
+
+        h6,
+        button {
+          margin: 0.5rem 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  .modal {
+    display: block;
+    padding: 2rem 0;
   }
 }
