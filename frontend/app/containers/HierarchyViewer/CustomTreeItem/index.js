@@ -11,7 +11,12 @@ import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import { fade, withStyles } from '@material-ui/core/styles';
 import TreeItem from '@material-ui/lab/TreeItem';
-import { Collapse, Typography, IconButton } from '@material-ui/core';
+import { Collapse, Typography, IconButton, Button } from '@material-ui/core';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { useSpring, animated } from 'react-spring/web.cjs'; // web.cjs is required for IE 11 support
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -22,12 +27,44 @@ import makeSelectCustomTreeItem from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
+import { useState } from 'react';
 
 export function CustomTreeItem(props) {
   useInjectReducer({ key: 'customTreeItem', reducer });
   useInjectSaga({ key: 'customTreeItem', saga });
 
-  return <StyledTreeItem {...props} />;
+  const [isDeleteDialogOpen, setisDeleteDialogOpen] = useState(false);
+
+  const deleteClass = () => {
+    console.log(`Delete `, props);
+  };
+
+  return (
+    <>
+      <StyledTreeItem
+        {...props}
+        setisDeleteDialogOpen={setisDeleteDialogOpen}
+      />
+      <Dialog open={isDeleteDialogOpen}>
+        <DialogTitle id="id-delete-dialog">
+          Delete "{props.label}" class
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you really want to delete {props.label} class?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setisDeleteDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={deleteClass} color="secondary" autoFocus>
+            Delete !
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }
 
 CustomTreeItem.propTypes = {
@@ -51,6 +88,7 @@ const withConnect = connect(
 
 export default compose(withConnect)(CustomTreeItem);
 
+// StyledTreeItem
 const StyledTreeItem = withStyles(theme => ({
   iconContainer: {
     '& .close': {
@@ -65,12 +103,19 @@ const StyledTreeItem = withStyles(theme => ({
 }))(props => (
   <TreeItem
     {...props}
+    nodeId={props.nodeId}
     TransitionComponent={TransitionComponent}
     label={
       <div className={styles.root}>
         <Typography variant="body2">{props.label}</Typography>
         <div>
-          <IconButton aria-label="delete">
+          <IconButton
+            aria-label="delete"
+            onClick={e => {
+              props.setisDeleteDialogOpen(true);
+              e.stopPropagation();
+            }}
+          >
             <DeleteIcon
               color="inherit"
               fontSize="small"

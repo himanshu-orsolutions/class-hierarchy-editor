@@ -20,11 +20,9 @@ import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
 
-export function HierarchyViewer({ dispatch, state }) {
+export function HierarchyViewer({ state }) {
   useInjectReducer({ key: 'hierarchyViewer', reducer });
   useInjectSaga({ key: 'hierarchyViewer', saga });
-
-  console.log(state);
 
   const getTree = data => {
     if (data) {
@@ -56,20 +54,6 @@ export function HierarchyViewer({ dispatch, state }) {
             defaultEndIcon={<CloseSquare />}
           >
             {getTree(state.treeData.superclassOf)}
-            {/* <CustomTreeItem nodeId="1" label="Main">
-            <CustomTreeItem nodeId="2" label="Hello" />
-            <CustomTreeItem nodeId="3" label="Subtree with children">
-              <CustomTreeItem nodeId="6" label="Hello" />
-              <CustomTreeItem nodeId="7" label="Sub-subtree with children">
-                <CustomTreeItem nodeId="9" label="Child 1" />
-                <CustomTreeItem nodeId="10" label="Child 2" />
-                <CustomTreeItem nodeId="11" label="Child 3" />
-              </CustomTreeItem>
-              <CustomTreeItem nodeId="8" label="Hello" />
-            </CustomTreeItem>
-            <CustomTreeItem nodeId="4" label="World" />
-            <CustomTreeItem nodeId="5" label="Something something" />
-          </CustomTreeItem> */}
           </TreeView>
         ) : (
           ''
