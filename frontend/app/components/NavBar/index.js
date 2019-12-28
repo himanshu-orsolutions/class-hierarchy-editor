@@ -56,6 +56,9 @@ function NavBar({ dispatch, searchQuery }) {
                 value={searchQuery}
               />
             </div>
+            <Button size="small" type="submit" className={styles.searchBtn}>
+              Search
+            </Button>
           </form>
           <Button size="small" onClick={() => setIsAddFormOpen(true)}>
             Add class

@@ -10,6 +10,8 @@ export default function* searchResultSaga() {
 }
 
 function* searchClasses(action) {
+  if (!action.data) return;
+
   yield put(startLoader());
 
   try {

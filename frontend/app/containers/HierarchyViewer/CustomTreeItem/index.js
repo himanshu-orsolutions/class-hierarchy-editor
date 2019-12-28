@@ -83,7 +83,7 @@ export function CustomTreeItem(props) {
               type="Edit"
               setIsFormOpen={setIsFormOpen}
               cid={props.nodeId}
-              name={props.label}
+              name={props.name}
               pid={props.pid}
               abstract={props.abstract}
               dispatch={props.dispatch}

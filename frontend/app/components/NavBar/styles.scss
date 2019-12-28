@@ -6,6 +6,16 @@
     display: block;
   }
 
+  form {
+    text-align: center;
+  }
+
+  .searchBtn {
+    display: none;
+    margin: auto;
+    margin-top: 0.5rem;
+  }
+
   .search {
     position: relative;
     margin-left: 8px;
@@ -74,5 +84,15 @@
   .modal {
     display: block;
     padding: 2rem 0;
+  }
+
+  form {
+    margin-bottom: 1rem;
+
+    .searchBtn {
+      display: block !important;
+      margin: auto !important;
+      margin-top: 0.5rem !important;
+    }
   }
 }

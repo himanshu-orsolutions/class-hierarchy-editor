@@ -38,6 +38,7 @@ export function HierarchyViewer({ state, dispatch }) {
         <CustomTreeItem
           nodeId={treeNode.cid}
           label={`${treeNode.name} (cid: ${treeNode.cid})`}
+          name={treeNode.name}
           key={treeNode.cid}
           pid={treeNode.pid}
           abstract={treeNode.abstract}

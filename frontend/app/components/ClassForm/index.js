@@ -52,7 +52,7 @@ function ClassForm({
         </FormControl>
 
         {/* Dont show pid input for root element */}
-        {values.pid && (
+        {(values.pid || type === 'Add') && (
           <FormControl variant="outlined">
             <InputLabel htmlFor="pid">Parent ID</InputLabel>
             <OutlinedInput
