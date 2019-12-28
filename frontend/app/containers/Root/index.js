@@ -30,10 +30,6 @@ export function Root(/* dispatch */) {
 
   return (
     <div>
-      <Helmet>
-        <title>Root</title>
-        <meta name="description" content="Description of Root" />
-      </Helmet>
       <Switch>
         <Route path="/" component={HomePage} />
       </Switch>

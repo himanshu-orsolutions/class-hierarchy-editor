@@ -27,10 +27,6 @@ export function HomePage({ dispatch, state }) {
 
   return (
     <div>
-      <Helmet>
-        <title>HomePage</title>
-        <meta name="description" content="Description of HomePage" />
-      </Helmet>
       <NavBar dispatch={dispatch} searchQuery={state.searchQuery} />
 
       {/* Search result */}

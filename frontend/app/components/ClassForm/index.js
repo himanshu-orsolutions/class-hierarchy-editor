@@ -39,6 +39,7 @@ function ClassForm({
           />
           <FormHelperText>{touched.cid ? errors.cid : ''}</FormHelperText>
         </FormControl>
+
         <FormControl variant="outlined">
           <InputLabel htmlFor="name">Class Name</InputLabel>
           <OutlinedInput
@@ -49,16 +50,22 @@ function ClassForm({
           />
           <FormHelperText>{touched.name ? errors.name : ''}</FormHelperText>
         </FormControl>
-        <FormControl variant="outlined">
-          <InputLabel htmlFor="pid">Parent ID</InputLabel>
-          <OutlinedInput
-            id="pid"
-            value={values.pid}
-            onChange={handleChange}
-            error={touched.pid && Boolean(errors.pid)}
-          />
-          <FormHelperText>{touched.pid ? errors.pid : ''}</FormHelperText>
-        </FormControl>
+
+        {/* Dont show pid input for root element */}
+        {values.pid && (
+          <FormControl variant="outlined">
+            <InputLabel htmlFor="pid">Parent ID</InputLabel>
+            <OutlinedInput
+              id="pid"
+              value={values.pid}
+              disabled={type === 'Edit'}
+              onChange={handleChange}
+              error={touched.pid && Boolean(errors.pid)}
+            />
+            <FormHelperText>{touched.pid ? errors.pid : ''}</FormHelperText>
+          </FormControl>
+        )}
+
         <FormControlLabel
           value="abstract"
           control={

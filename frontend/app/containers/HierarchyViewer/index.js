@@ -37,7 +37,7 @@ export function HierarchyViewer({ state, dispatch }) {
       return data.map(treeNode => (
         <CustomTreeItem
           nodeId={treeNode.cid}
-          label={treeNode.name}
+          label={`${treeNode.name} (cid: ${treeNode.cid})`}
           key={treeNode.cid}
           pid={treeNode.pid}
           abstract={treeNode.abstract}
@@ -51,14 +51,12 @@ export function HierarchyViewer({ state, dispatch }) {
 
   return (
     <div className={styles.root}>
-      <Helmet>
-        <title>HierarchyViewer</title>
-        <meta name="description" content="Description of HierarchyViewer" />
-      </Helmet>
       <div>
         <Typography variant="h6">
-          {state.treeData && state.treeData.name != 'Root'
-            ? state.treeData.name
+          {state.treeData
+            ? state.treeData.name != 'Root'
+              ? state.treeData.name
+              : 'All'
             : ''}{' '}
           Class hierarchy
         </Typography>
