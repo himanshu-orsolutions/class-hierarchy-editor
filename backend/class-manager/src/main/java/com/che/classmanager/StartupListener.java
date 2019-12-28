@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
 import com.che.classmanager.controllers.ClassController;
@@ -34,7 +36,7 @@ public class StartupListener implements ApplicationListener<ApplicationStartedEv
 	public void onApplicationEvent(ApplicationStartedEvent event) {
 
 		// Initializing the hierarchy map and class name map
-		List<CHEClass> cheClasses = cheRepository.findAll();
+		List<CHEClass> cheClasses = cheRepository.findAll(Sort.by(Direction.ASC, "creationTime"));
 
 		// Adding the top class with cid 0
 		CHEClass rootClass = new CHEClass(0, -1, "Root", true);

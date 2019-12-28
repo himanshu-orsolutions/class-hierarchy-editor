@@ -1,5 +1,7 @@
 package com.che.classmanager.models;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,6 +24,9 @@ public class CHEClass {
 
 	@Column(name = "abstract")
 	Boolean isAbstract;
+
+	@Column(name = "creation_time")
+	Date creationTime;
 
 	public Integer getCid() {
 		return cid;
@@ -55,12 +60,21 @@ public class CHEClass {
 		this.isAbstract = isAbstract;
 	}
 
+	public Date getCreationTime() {
+		return creationTime;
+	}
+
+	public void setCreationTime(Date creationTime) {
+		this.creationTime = creationTime;
+	}
+
 	public CHEClass(Integer cid, Integer pid, String name, Boolean isAbstract) {
 		super();
 		this.cid = cid;
 		this.pid = pid;
 		this.name = name;
 		this.isAbstract = isAbstract;
+		this.creationTime = new Date(System.currentTimeMillis());
 	}
 
 	public CHEClass() {
