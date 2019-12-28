@@ -37,18 +37,22 @@ export function SearchResult({ state, dispatch }) {
       {state.isShowSearchResult && (
         <div className={styles.root}>
           <Typography variant="h6">Search Result</Typography>
-          <Button
-            className={styles.resetBtn}
-            color="primary"
-            variant="contained"
-            size="small"
-            onClick={() => {
-              dispatch(resetSearch());
-              dispatch(startLoadingTreeData(0));
-            }}
-          >
-            Reset search
-          </Button>
+
+          {state && !state.isLoading && (
+            <Button
+              className={styles.resetBtn}
+              color="primary"
+              variant="contained"
+              size="small"
+              onClick={() => {
+                dispatch(resetSearch());
+                dispatch(startLoadingTreeData(0));
+              }}
+            >
+              Reset search
+            </Button>
+          )}
+
           {state && !state.isLoading ? (
             <TableContainer>
               <Table

@@ -13,3 +13,12 @@
     right: 1rem;
   }
 }
+
+@media (max-width: 600px), (max-height: 600px) {
+  .resetBtn {
+    position: unset !important;
+    top: unset !important;
+    right: unset !important;
+    margin-bottom: 1rem !important;
+  }
+}

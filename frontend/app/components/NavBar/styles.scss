@@ -78,13 +78,6 @@
       }
     }
   }
-}
-
-@media (max-width: 600px), (max-height: 600px) {
-  .modal {
-    display: block;
-    padding: 2rem 0;
-  }
 
   form {
     margin-bottom: 1rem;
@@ -94,5 +87,12 @@
       margin: auto !important;
       margin-top: 0.5rem !important;
     }
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  .modal {
+    display: block;
+    padding: 2rem 0;
   }
 }

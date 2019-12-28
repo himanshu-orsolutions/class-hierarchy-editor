@@ -95,7 +95,7 @@ export function CustomTreeItem(props) {
       {/* Delete dialog */}
       <Dialog open={isDeleteDialogOpen}>
         <DialogTitle id="id-delete-dialog">
-          Delete "{props.label}" class
+          Delete "{props.name}" class
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
