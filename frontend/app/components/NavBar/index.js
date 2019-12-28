@@ -16,19 +16,21 @@ import {
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import ClassForm from 'components/ClassForm';
+import { startSearch } from 'containers/SearchResult/actions';
+import { setSearchQuery } from 'containers/HomePage/actions';
 
 import styles from './styles.scss';
 
-function NavBar({ dispatch }) {
-  const handleSubmit = e => {
-    console.log(e);
+function NavBar({ dispatch, searchQuery }) {
+  const handleSearch = e => {
     e.preventDefault();
+    dispatch(startSearch(searchQuery));
   };
 
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
   const onSearchTextChange = e => {
-    console.log(e.target.value);
+    dispatch(setSearchQuery(e.target.value));
   };
 
   return (
@@ -38,7 +40,7 @@ function NavBar({ dispatch }) {
           <Typography className={styles.title} variant="h6" noWrap>
             Class hierarchy editor
           </Typography>
-          <form onSubmit={handleSubmit} noValidate>
+          <form onSubmit={handleSearch} noValidate>
             <div className={styles.search}>
               <div className={styles.searchIcon}>
                 <SearchIcon />
@@ -51,6 +53,7 @@ function NavBar({ dispatch }) {
                 }}
                 inputProps={{ 'aria-label': 'search' }}
                 onChange={onSearchTextChange}
+                value={searchQuery}
               />
             </div>
           </form>

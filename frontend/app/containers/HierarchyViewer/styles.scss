@@ -1,10 +1,7 @@
 .root {
   padding: 1rem;
 
-  :global {
-    .MuiCircularProgress-colorPrimary {
-      margin-left: 1rem;
-      margin-top: 1rem;
-    }
+  h6 {
+    margin-bottom: 0.5rem;
   }
 }

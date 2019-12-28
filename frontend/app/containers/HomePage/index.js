@@ -11,7 +11,9 @@ import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 import NavBar from 'components/NavBar/index';
 import HierarchyViewer from 'containers/HierarchyViewer';
+import { Paper } from '@material-ui/core';
 
+import SearchResult from 'containers/SearchResult/index';
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
 import makeSelectHomePage from './selectors';
@@ -19,7 +21,7 @@ import reducer from './reducer';
 import saga from './saga';
 import styles from './styles.scss';
 
-export function HomePage({ dispatch }) {
+export function HomePage({ dispatch, state }) {
   useInjectReducer({ key: 'homePage', reducer });
   useInjectSaga({ key: 'homePage', saga });
 
@@ -29,8 +31,16 @@ export function HomePage({ dispatch }) {
         <title>HomePage</title>
         <meta name="description" content="Description of HomePage" />
       </Helmet>
-      <NavBar dispatch={dispatch} />
-      <HierarchyViewer />
+      <NavBar dispatch={dispatch} searchQuery={state.searchQuery} />
+
+      {/* Search result */}
+      <Paper elevation={1} className={styles.paper}>
+        <SearchResult />
+      </Paper>
+
+      <Paper elevation={1} className={styles.paper}>
+        <HierarchyViewer />
+      </Paper>
     </div>
   );
 }
@@ -38,7 +48,7 @@ export function HomePage({ dispatch }) {
 HomePage.propTypes = {};
 
 const mapStateToProps = createStructuredSelector({
-  homePage: makeSelectHomePage(),
+  state: makeSelectHomePage(),
 });
 
 function mapDispatchToProps(dispatch) {

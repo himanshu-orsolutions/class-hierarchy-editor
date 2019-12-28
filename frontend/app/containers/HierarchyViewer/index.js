@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /**
  *
  * HierarchyViewer
@@ -12,6 +13,7 @@ import { compose } from 'redux';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import TreeView from '@material-ui/lab/TreeView';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Typography } from '@material-ui/core';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
@@ -54,15 +56,27 @@ export function HierarchyViewer({ state, dispatch }) {
         <meta name="description" content="Description of HierarchyViewer" />
       </Helmet>
       <div>
+        <Typography variant="h6">
+          {state.treeData && state.treeData.name != 'Root'
+            ? state.treeData.name
+            : ''}{' '}
+          Class hierarchy
+        </Typography>
         {state && !state.isLoading ? (
-          <TreeView
-            defaultExpanded={['1']}
-            defaultCollapseIcon={<MinusSquare />}
-            defaultExpandIcon={<PlusSquare />}
-            defaultEndIcon={<CloseSquare />}
-          >
-            {getTree(state.treeData.superclassOf)}
-          </TreeView>
+          state.treeData.superclassOf ? (
+            <>
+              <TreeView
+                defaultExpanded={['1']}
+                defaultCollapseIcon={<MinusSquare />}
+                defaultExpandIcon={<PlusSquare />}
+                defaultEndIcon={<CloseSquare />}
+              >
+                {getTree(state.treeData.superclassOf)}
+              </TreeView>
+            </>
+          ) : (
+            'No data available'
+          )
         ) : (
           <CircularProgress />
         )}

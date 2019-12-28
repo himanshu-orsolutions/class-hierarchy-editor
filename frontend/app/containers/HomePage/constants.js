@@ -4,4 +4,4 @@
  *
  */
 
-export const DEFAULT_ACTION = 'app/HomePage/DEFAULT_ACTION';
+export const SET_SEARCH_QUERY = 'app/HomePage/SET_SEARCH_QUERY';

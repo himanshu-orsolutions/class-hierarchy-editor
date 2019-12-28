@@ -4,10 +4,11 @@
  *
  */
 
-import { DEFAULT_ACTION } from './constants';
+import { SET_SEARCH_QUERY } from './constants';
 
-export function defaultAction() {
+export function setSearchQuery(data) {
   return {
-    type: DEFAULT_ACTION,
+    type: SET_SEARCH_QUERY,
+    data,
   };
 }
