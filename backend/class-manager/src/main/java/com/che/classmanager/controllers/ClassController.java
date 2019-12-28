@@ -1,5 +1,6 @@
 package com.che.classmanager.controllers;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -227,6 +228,9 @@ public class ClassController {
 			if (cheClass.getPid() == null) {
 				cheClass.setPid(0);
 			}
+
+			// Setting the creation time
+			cheClass.setCreationTime(new Date(System.currentTimeMillis()));
 		}
 
 		// Adding all classes
