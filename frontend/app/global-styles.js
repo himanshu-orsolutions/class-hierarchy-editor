@@ -28,6 +28,25 @@ const GlobalStyle = createGlobalStyle`
   h1, h2, h3, h4, h5, button {
     user-select: none; 
   }
+
+  ::-webkit-scrollbar {
+    height: 0.5rem;
+    width: 0.5rem;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #c5c5c5;
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #969696;
+    border-radius: 78px;
+    border-bottom: 1px solid white;
+    border-top: 1px solid white;
+  }
 `;
 
 export default GlobalStyle;
