@@ -1,0 +1,48 @@
+.root {
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
+  }
+
+  button {
+    padding: 5px;
+
+    visibility: hidden;
+  }
+
+  p {
+    margin-right: 1rem;
+  }
+}
+
+.modal {
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+
+  .content {
+    background-color: #fff;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  .root {
+    button {
+      visibility: visible;
+    }
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  .modal {
+    display: block !important;
+    padding: 2rem 0 !important;
+  }
+}

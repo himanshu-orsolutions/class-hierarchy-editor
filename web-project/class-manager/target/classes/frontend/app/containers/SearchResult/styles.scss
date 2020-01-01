@@ -1,0 +1,24 @@
+.root {
+  padding: 1rem 1rem;
+  position: relative;
+  min-width: 37rem;
+
+  h6 {
+    margin-bottom: 1rem;
+  }
+
+  .resetBtn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  .resetBtn {
+    position: unset !important;
+    top: unset !important;
+    right: unset !important;
+    margin-bottom: 1rem !important;
+  }
+}

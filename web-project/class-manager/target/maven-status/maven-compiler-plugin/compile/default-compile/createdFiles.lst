@@ -1,0 +1,9 @@
+com/che/classmanager/models/Node.class
+com/che/classmanager/ClassManagerApplication.class
+com/che/classmanager/models/CHEClass.class
+com/che/classmanager/StartupListener.class
+com/che/classmanager/controllers/ClassController.class
+com/che/classmanager/models/Container.class
+com/che/classmanager/constants/IClassConstants.class
+com/che/classmanager/utils/ResponseGenerator.class
+com/che/classmanager/repositories/CHERepository.class

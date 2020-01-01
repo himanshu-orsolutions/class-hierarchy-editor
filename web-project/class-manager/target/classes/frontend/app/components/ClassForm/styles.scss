@@ -1,0 +1,35 @@
+.container {
+  color: inherit;
+
+  :global {
+    h2 {
+      font-weight: 400;
+      text-align: center;
+      margin: 0;
+    }
+
+    .form {
+      margin-top: 1rem;
+
+      label {
+        background-color: white;
+        padding: 0 0.5rem;
+      }
+
+      .MuiFormControl-root {
+        width: 100%;
+        margin: 1rem 0;
+      }
+
+      .save-edit-btn {
+        width: 100%;
+        text-align: center;
+        margin-top: 1rem;
+
+        .MuiButtonBase-root {
+          margin: 0 1rem;
+        }
+      }
+    }
+  }
+}

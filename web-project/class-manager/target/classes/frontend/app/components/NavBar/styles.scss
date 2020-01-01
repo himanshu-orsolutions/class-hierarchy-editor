@@ -1,0 +1,98 @@
+.root {
+  flex-grow: 1;
+
+  .title {
+    flex-grow: 1;
+    display: block;
+  }
+
+  form {
+    text-align: center;
+  }
+
+  .searchBtn {
+    display: none;
+    margin: auto;
+    margin-top: 0.5rem;
+  }
+
+  .search {
+    position: relative;
+    margin-left: 8px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.15);
+    width: auto;
+
+    .searchIcon {
+      width: 56px;
+      height: 100%;
+      display: flex;
+      position: absolute;
+      align-items: center;
+      pointer-events: none;
+      justify-content: center;
+    }
+
+    .inputRoot {
+      color: #fff !important;
+      padding: 0px 8px 0px 56px;
+      transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+      .inputInput {
+        width: 100%;
+      }
+    }
+  }
+
+  button {
+    color: #fff;
+    background: #5c6bc0;
+    margin-left: 1rem;
+    padding: 0.3rem 1rem;
+  }
+}
+
+.modal {
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+
+  .content {
+    background-color: #fff;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .root {
+    :global {
+      .MuiToolbar-root {
+        flex-direction: column;
+
+        h6,
+        button {
+          margin: 0.5rem 0;
+        }
+      }
+    }
+  }
+
+  form {
+    margin-bottom: 1rem;
+
+    .searchBtn {
+      display: block !important;
+      margin: auto !important;
+      margin-top: 0.5rem !important;
+    }
+  }
+}
+
+@media (max-width: 600px), (max-height: 600px) {
+  .modal {
+    display: block;
+    padding: 2rem 0;
+  }
+}
